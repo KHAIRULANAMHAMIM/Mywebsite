@@ -1,27 +1,43 @@
-# Mywebsite
-import random
+import sqlite3
 
-def guess_the_number():
-    secret_number = random.randint(1, 100)
-    attempts = 0
+# Create a SQLite database connection and cursor
+conn = sqlite3.connect("blog.db")
+cursor = conn.cursor()
 
-    print("Welcome to the Guess the Number game!")
-    print("I'm thinking of a number between 1 and 100.")
+# Create a table to store blog posts
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS posts (
+        id INTEGER PRIMARY KEY,
+        title TEXT,
+        content TEXT
+    )
+""")
+conn.commit()
 
-    while True:
-        try:
-            user_guess = int(input("Take a guess: "))
-            attempts += 1
+def create_post():
+    title = input("Enter the post title: ")
+    content = input("Enter the post content: ")
 
-            if user_guess < secret_number:
-                print("Too low! Try again.")
-            elif user_guess > secret_number:
-                print("Too high! Try again.")
-            else:
-                print(f"Congratulations! You guessed the number {secret_number} in {attempts} attempts!")
-                break
-        except ValueError:
-            print("Invalid input. Please enter a valid number.")
+    cursor.execute("INSERT INTO posts (title, content) VALUES (?, ?)", (title, content))
+    conn.commit()
+    print("Post created successfully!")
 
-if __name__ == "__main__":
-    guess_the_number()
+def list_posts():
+    cursor.execute("SELECT * FROM posts")
+    posts = cursor.fetchall()
+
+    if posts:
+        for post in posts:
+            print(f"Title: {post[1]}\nContent: {post[2]}\n")
+    else:
+        print("No posts found.")
+
+while True:
+    print("\nBlog Menu:")
+    print("1. Create a new post")
+    print("2. List all posts")
+    print("3. Exit")
+
+    choice = input("Enter your choice: ")
+
+    if choice == "1
